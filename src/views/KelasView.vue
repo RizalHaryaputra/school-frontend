@@ -71,7 +71,7 @@
                             <td class="px-6 py-5 font-mono text-gray-700">{{ kelas.kode_kelas }}</td>
                             <td class="px-6 py-5 font-semibold text-gray-900">{{ kelas.nama_kelas }}</td>
                             <td class="px-6 py-5 text-right space-x-2">
-                                <button
+                                <button @click="openEditModal(kelas)"
                                     class="text-sm font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition">Edit</button>
                                 <button
                                     class="text-sm font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Hapus</button>
@@ -120,7 +120,7 @@
                     <div
                         class="relative bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
                         <div class="px-6 py-5 border-b border-gray-100">
-                            <h3 class="text-xl font-bold text-gray-900">Tambah Data Kelas</h3>
+                            <h3 class="text-xl font-bold text-gray-900">{{ editingId ? 'Edit Data Kelas' : 'Tambah Data Kelas' }}</h3>
                             <p class="text-sm text-gray-500 mt-1">Silakan lengkapi formulir di bawah ini.</p>
                         </div>
 
@@ -158,7 +158,7 @@
                                     class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-medium transition shadow-md disabled:opacity-70 disabled:cursor-not-allowed flex items-center">
                                     <span v-if="isSubmitting"
                                         class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
-                                    <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan Data' }}</span>
+                                    <span>{{ isSubmitting ? 'Menyimpan...' : (editingId ? 'Simpan Perubahan' : 'Simpan Data') }}</span>
                                 </button>
                             </div>
                         </form>
@@ -185,6 +185,7 @@ const isModalOpen = ref(false)
 const isSubmitting = ref(false)
 const formModel = ref({}) // Tempat menyimpan inputan user untuk modal
 const formErrors = ref({}) // Tempat menyimpan error validasi dari backend
+const editingId = ref(null) // Menyimpan ID data yang sedang diedit (null jika tambah baru)
 
 // --- Fungsi Manajemen List ---
 const fetchKelas = async (page = 1) => {
@@ -229,14 +230,28 @@ const resetSearch = () => {
 
 // --- Fungsi Manajemen Modal (Tambah Data) ---
 const openModal = () => {
+    editingId.value = null // Pastikan editingId kosong
     formErrors.value = {}
     formModel.value = {}
 
-    // Membaca 'template' dari backend untuk menyiapkan variabel model
     if (koleksi.value?.template?.data) {
         koleksi.value.template.data.forEach(field => {
-            // Set nilai default dari HATEOAS (biasanya string kosong)
             formModel.value[field.name] = field.value || ''
+        })
+    }
+    isModalOpen.value = true
+}
+
+const openEditModal = (kelas) => {
+    editingId.value = kelas.id // Set editingId dengan ID kelas yang diklik
+    formErrors.value = {}
+    formModel.value = {}
+
+    // Mengisi formModel dengan data kelas yang dipilih
+    if (koleksi.value?.template?.data) {
+        koleksi.value.template.data.forEach(field => {
+            // Kita ambil value dari objek 'kelas', bukan dari HATEOAS default
+            formModel.value[field.name] = kelas[field.name] || ''
         })
     }
     isModalOpen.value = true
@@ -244,22 +259,27 @@ const openModal = () => {
 
 const closeModal = () => {
     isModalOpen.value = false
+    editingId.value = null // Bersihkan state saat modal ditutup
 }
 
 const submitForm = async () => {
     isSubmitting.value = true
-    formErrors.value = {} // Reset error sebelumnya
+    formErrors.value = {}
 
     try {
-        // Menembak endpoint POST /api/kelas sesuai standar REST
-        await api.post('/kelas', formModel.value)
+        if (editingId.value) {
+            // Jika mode EDIT, tembak endpoint PUT /api/kelas/{id}
+            await api.put(`/kelas/${editingId.value}`, formModel.value)
+        } else {
+            // Jika mode TAMBAH, tembak endpoint POST /api/kelas
+            await api.post('/kelas', formModel.value)
+        }
 
-        // Jika sukses
         closeModal()
-        fetchKelas(1) // Refresh tabel untuk melihat data baru
+        // Refresh tabel (tetap di halaman saat ini)
+        fetchKelas(koleksi.value.meta?.current_page || 1)
 
     } catch (error) {
-        // Menangkap validasi error (422) dari request Laravel
         if (error.response && error.response.status === 422) {
             formErrors.value = error.response.data.errors
         } else {

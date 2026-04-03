@@ -11,9 +11,10 @@
             class="fixed id-0 inset-y-0 z-30 lg:relative lg:block w-72 bg-white text-gray-900 flex flex-col shadow-xl lg:shadow-none transform transition-transform duration-300 ease-in-out border-r border-gray-100">
             <div class="h-20 flex items-center justify-between px-6 border-b border-gray-100">
                 <RouterLink :to="{ name: 'home' }" class="flex items-center space-x-3 group">
-                    <div class="p-2.5 rounded-xl bg-blue-600 text-white shadow-blue-300 shadow-md">
-                        <AcademicCapIcon class="w-7 h-7" />
+                    <div class="p-1 rounded-xl bg-blue-600 text-white shadow-blue-300 shadow-md">
+                        <img src="/public/images/logo-school-edu.png" alt="Logo" class="w-12 h-12" />
                     </div>
+                    
                     <span
                         class="font-bold text-2xl text-gray-950 tracking-tight group-hover:text-blue-600 transition">SCHOOL<span
                             class="font-light text-gray-600">api</span></span>
