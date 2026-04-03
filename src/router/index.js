@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import LoginView from '../views/LoginView.vue'
 import DashboardLayout from '../layouts/DashboardLayout.vue' // Import Layout baru kita
+import KelasView from '../views/KelasView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,10 +29,15 @@ const router = createRouter({
           path: '', // Ini berarti root path '/'
           name: 'home',
           component: () => import('../views/HomeView.vue')
+        },
+        {
+          path: 'kelas', // <-- Tambahkan block ini
+          name: 'kelas',
+          component: KelasView
         }
-        // Nanti kita bisa tambah rute kelas, siswa, dll di sini
       ]
-    }
+    },
+
   ]
 })
 
