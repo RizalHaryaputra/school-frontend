@@ -11,14 +11,13 @@
             class="fixed id-0 inset-y-0 z-30 lg:relative lg:block w-72 bg-white text-gray-900 flex flex-col shadow-xl lg:shadow-none transform transition-transform duration-300 ease-in-out border-r border-gray-100">
             <div class="h-20 flex items-center justify-between px-6 border-b border-gray-100">
                 <RouterLink :to="{ name: 'home' }" class="flex items-center space-x-3 group">
-                    <div class="p-2.5 rounded-xl bg-blue-600 text-white shadow-blue-300 shadow-md">
-                        <AcademicCapIcon class="w-7 h-7" />
+                    <div class="p-1 rounded-xl bg-blue-600 text-white shadow-blue-300 shadow-md">
+                        <img src="/images/logo-school-edu.png" alt="Logo" class="w-12 h-12" />
                     </div>
                     <span
                         class="font-bold text-2xl text-gray-950 tracking-tight group-hover:text-blue-600 transition">SCHOOL<span
                             class="font-light text-gray-600">api</span></span>
                 </RouterLink>
-
                 <button @click="isSidebarOpen = false" class="lg:hidden text-gray-500 hover:text-gray-900">
                     <XMarkIcon class="w-6 h-6" />
                 </button>
@@ -33,7 +32,6 @@
                         :class="$route.name === 'home' ? 'text-blue-100' : 'text-gray-400 group-hover:text-blue-600'" />
                     <span>Dashboard</span>
                 </RouterLink>
-
                 <RouterLink to="/kelas"
                     class="flex items-center space-x-3.5 px-4 py-3 rounded-xl transition font-medium group" :class="$route.path.startsWith('/kelas')
                         ? 'bg-blue-600 text-white shadow-lg shadow-blue-100'
@@ -42,7 +40,6 @@
                         :class="$route.path.startsWith('/kelas') ? 'text-blue-100' : 'text-gray-400 group-hover:text-blue-600'" />
                     <span>Data Kelas</span>
                 </RouterLink>
-
                 <RouterLink to="/siswa"
                     class="flex items-center space-x-3.5 px-4 py-3 rounded-xl transition font-medium group" :class="$route.path.startsWith('/siswa')
                         ? 'bg-blue-600 text-white shadow-lg shadow-blue-100'
@@ -51,7 +48,6 @@
                         :class="$route.path.startsWith('/siswa') ? 'text-blue-100' : 'text-gray-400 group-hover:text-blue-600'" />
                     <span>Data Siswa</span>
                 </RouterLink>
-
                 <RouterLink to="/guru"
                     class="flex items-center space-x-3.5 px-4 py-3 rounded-xl transition font-medium group" :class="$route.path.startsWith('/guru')
                         ? 'bg-blue-600 text-white shadow-lg shadow-blue-100'
@@ -94,7 +90,7 @@
                         <BellIcon class="w-6 h-6" />
                     </button>
 
-                    <button @click="handleLogout"
+                    <button @click="promptLogout"
                         class="text-sm font-semibold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-5 py-2.5 rounded-xl transition flex items-center space-x-2">
                         <ArrowRightOnRectangleIcon class="w-5 h-5" />
                         <span>Logout</span>
@@ -107,6 +103,17 @@
             </main>
         </div>
     </div>
+
+    <ConfirmModal
+        :isOpen="isLogoutModalOpen"
+        :isLoading="isLoggingOut" title="Konfirmasi Logout"
+        message="Apakah Anda yakin ingin keluar dari sesi saat ini? Anda harus login kembali untuk mengakses sistem."
+        confirmText="Ya, Logout"
+        cancelText="Batal"
+        type="danger"
+        @confirm="executeLogout"
+        @cancel="isLogoutModalOpen = false"
+    />
 </template>
 
 <script setup>
@@ -115,6 +122,7 @@ import { RouterLink, RouterView, useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import api from '../utils/api'
 import { AcademicCapIcon, HomeIcon, RectangleGroupIcon, UsersIcon, BriefcaseIcon, Bars3Icon, BellIcon, ArrowRightOnRectangleIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+import ConfirmModal from '../components/ConfirmModal.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -122,6 +130,9 @@ const authStore = useAuthStore()
 
 // State untuk membuka/menutup sidebar di mobile
 const isSidebarOpen = ref(false)
+
+const isLogoutModalOpen = ref(false)
+const isLoggingOut = ref(false)
 
 // Computed property untuk mendapatkan judul halaman berdasarkan rute saat ini
 const currentRouteTitle = computed(() => {
@@ -132,12 +143,22 @@ const currentRouteTitle = computed(() => {
     }
 })
 
-const handleLogout = async () => {
+// 1. Fungsi buka modal
+const promptLogout = () => {
+    isLogoutModalOpen.value = true
+}
+
+// 2. Fungsi eksekusi logout sebenarnya
+const executeLogout = async () => {
+    isLoggingOut.value = true // <-- 2. Nyalakan loading
     try {
         await api.post('/logout')
     } catch (error) {
         console.error('Gagal memanggil API logout.')
     } finally {
+        // Karena kita akan pindah halaman, loading tidak perlu di-false kan
+        // tapi modal tetap kita tutup dan hapus state lokal
+        isLogoutModalOpen.value = false
         authStore.logout()
         router.push({ name: 'login' })
     }

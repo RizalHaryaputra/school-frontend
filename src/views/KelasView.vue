@@ -6,8 +6,8 @@
                 <p class="text-sm text-gray-500 mt-1">Kelola data kelas yang terdaftar di sistem.</p>
             </div>
 
-            <button
-                class="flex justify-center bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition shadow-lg shadow-blue-200 flex items-center space-x-2">
+            <button @click="openModal"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition shadow-lg shadow-blue-200 flex items-center space-x-2">
                 <PlusIcon class="w-5 h-5" />
                 <span>Tambah Kelas</span>
             </button>
@@ -33,7 +33,7 @@
                             Cari
                         </button>
                         <button type="button" @click="resetSearch"
-                            class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-600 font-medium transition flex justify-center">
+                            class="px-4 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-600 font-medium transition flex justify-center">
                             Reset
                         </button>
                     </div>
@@ -71,12 +71,10 @@
                             <td class="px-6 py-5 font-mono text-gray-700">{{ kelas.kode_kelas }}</td>
                             <td class="px-6 py-5 font-semibold text-gray-900">{{ kelas.nama_kelas }}</td>
                             <td class="px-6 py-5 text-right space-x-2">
-                                <button
-                                    class="mt-2 text-sm font-medium text-yellow-600 hover:text-yellow-700 bg-yellow-50 hover:bg-yellow-100 px-3 py-1.5 rounded-lg transition">Detail</button>
-                                <button
-                                    class="mt-2 text-sm font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition">Edit</button>
-                                <button
-                                    class="mt-2 text-sm font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Hapus</button>
+                                <button @click="openEditModal(kelas)"
+                                    class="text-sm font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition">Edit</button>
+                                <button @click="confirmDelete(kelas.id)"
+                                    class="text-sm font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Hapus</button>
                             </td>
                         </tr>
                         <tr v-if="koleksi?.items?.length === 0 || !koleksi?.items">
@@ -92,9 +90,9 @@
                 class="bg-gray-50 px-4 sm:px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
                 <div class="text-center sm:text-left w-full sm:w-auto">
                     Menampilkan halaman <span class="font-semibold text-gray-900">{{ koleksi.meta?.current_page || 1
-                    }}</span> dari <span class="font-semibold text-gray-900">{{ koleksi.meta?.last_page || 1
+                        }}</span> dari <span class="font-semibold text-gray-900">{{ koleksi.meta?.last_page || 1
                         }}</span>
-                    <span class="block sm:inline mt-1 sm:mt-0 text-xs sm:text-sm"> (Total: <span
+                    <span class="block sm:inline mt-1 sm:mt-0 text-xs sm:text-sm">(Total: <span
                             class="font-semibold text-blue-600">{{ koleksi.meta?.total || 0 }}</span> data)</span>
                 </div>
                 <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-end">
@@ -111,56 +109,128 @@
                 </div>
             </div>
         </div>
+
+        <Teleport to="body">
+            <transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0"
+                enter-to-class="opacity-100" leave-active-class="transition duration-150 ease-in"
+                leave-from-class="opacity-100" leave-to-class="opacity-0">
+                <div v-if="isModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center px-4">
+                    <div class="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" @click="closeModal"></div>
+
+                    <div
+                        class="relative bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
+                        <div class="px-6 py-5 border-b border-gray-100">
+                            <h3 class="text-xl font-bold text-gray-900">{{ editingId ? 'Edit Data Kelas' : 'Tambah Kelas' }}</h3>
+                            <p class="text-sm text-gray-500 mt-1">Silakan lengkapi formulir di bawah ini.</p>
+                        </div>
+
+                        <form @submit.prevent="submitForm">
+                            <div class="p-6 space-y-4">
+                                <div v-if="formErrors.message"
+                                    class="bg-red-50 text-red-600 text-sm p-3 rounded-lg font-medium">
+                                    {{ formErrors.message }}
+                                </div>
+
+                                <div v-for="field in koleksi?.template?.data || []" :key="field.name">
+                                    <label :for="'modal-' + field.name"
+                                        class="block text-sm font-medium text-gray-700 mb-1.5 capitalize">
+                                        {{ field.name.replace('_', ' ') }}
+                                        <span v-show="field.required" class="text-red-500 ml-1">*</span>
+                                    </label>
+                                    <input :id="'modal-' + field.name" v-model="formModel[field.name]"
+                                        :type="field.type || 'text'" :required="field.required"
+                                        :maxlength="field.maxlength"
+                                        class="w-full px-4 py-2.5 rounded-xl border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition outline-none"
+                                        :class="formErrors[field.name] ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-white'"
+                                        :placeholder="'Contoh: ' + (field.prompt || field.name)" />
+                                    <p v-if="formErrors[field.name]" class="text-red-500 text-xs mt-1 font-medium">
+                                        {{ formErrors[field.name][0] }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end space-x-3">
+                                <button type="button" @click="closeModal"
+                                    class="px-5 py-2.5 rounded-xl text-gray-700 font-medium hover:bg-gray-200 transition">
+                                    Batal
+                                </button>
+                                <button type="submit" :disabled="isSubmitting"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-medium transition shadow-md disabled:opacity-70 disabled:cursor-not-allowed flex items-center">
+                                    <span v-if="isSubmitting"
+                                        class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+                                    <span>{{ isSubmitting ? 'Menyimpan...' : (editingId ? 'Simpan Perubahan' : 'Simpan Data') }}</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </transition>
+        </Teleport>
     </div>
+
+    <ConfirmModal
+        :isOpen="isDeleteModalOpen"
+        :isLoading="isDeleting"  title="Hapus Data Kelas"
+        message="Apakah Anda yakin ingin menghapus kelas ini? Tindakan ini tidak dapat dibatalkan."
+        confirmText="Ya, Hapus"
+        cancelText="Batal"
+        type="danger"
+        @confirm="executeDelete"
+        @cancel="isDeleteModalOpen = false"
+    />
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { PlusIcon, ExclamationTriangleIcon, MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
+import { PlusIcon, ExclamationTriangleIcon, XMarkIcon, ExclamationCircleIcon } from '@heroicons/vue/24/outline'
 import api from '../utils/api'
+import ConfirmModal from '../components/ConfirmModal.vue'
 
-// State Management
+// --- State List & Search ---
 const koleksi = ref({ items: [], meta: null, template: null, queries: [] })
 const isLoading = ref(true)
 const errorMessage = ref('')
-
-// State untuk menyimpan inputan user (otomatis terikat ke field API)
 const searchForm = ref({})
 
+// --- State Hapus ---
+const isDeleteModalOpen = ref(false)
+const deleteTargetId = ref(null)
+const isDeleting = ref(false)
+
+// --- State Modal (Tambah & Edit Data) ---
+const isModalOpen = ref(false)
+const isSubmitting = ref(false)
+const formModel = ref({}) // Tempat menyimpan inputan user untuk modal
+const formErrors = ref({}) // Tempat menyimpan error validasi dari backend
+const editingId = ref(null) // Menyimpan ID data yang sedang diedit (null jika tambah baru)
+
+// --- Fungsi Manajemen List ---
 const fetchKelas = async (page = 1) => {
     isLoading.value = true
     errorMessage.value = ''
-
     try {
-        // Membuang parameter pencarian yang kosong agar URL API tetap bersih
         const cleanParams = Object.fromEntries(
             Object.entries(searchForm.value).filter(([_, v]) => v !== '' && v !== null)
         )
-
-        // Menggunakan objek `params` di axios untuk otomatis merakit query string (?page=1&nama_kelas=IPA)
         const response = await api.get('/kelas', {
-            params: {
-                page: page,
-                ...cleanParams
-            }
+            params: { page: page, ...cleanParams }
         })
-
         const rawData = response.data
         koleksi.value = { items: [], meta: null, template: null, queries: [] }
 
-        // 1. Tangkap Items
         if (rawData.items) koleksi.value.items = rawData.items
         else if (rawData.data && rawData.data.items) koleksi.value.items = rawData.data.items
         else if (Array.isArray(rawData.data)) koleksi.value.items = rawData.data
 
-        // 2. Tangkap Meta
         if (rawData.meta) koleksi.value.meta = rawData.meta
         else if (rawData.data && rawData.data.meta) koleksi.value.meta = rawData.data.meta
 
-        // 3. Tangkap Queries (HATEOAS)
         if (rawData.queries) koleksi.value.queries = rawData.queries
         else if (rawData.data && rawData.data.queries) koleksi.value.queries = rawData.data.queries
 
+        // MENGAMBIL TEMPLATE HATEOAS DARI API
+        if (rawData.template) koleksi.value.template = rawData.template
+        else if (rawData.data && rawData.data.template) koleksi.value.template = rawData.data.template
     } catch (error) {
         console.error(error)
         errorMessage.value = 'Gagal mengambil data dari server. Pastikan Anda memiliki akses.'
@@ -169,18 +239,102 @@ const fetchKelas = async (page = 1) => {
     }
 }
 
-// Fungsi Submit Form
-const handleSearch = () => {
-    // Setiap melakukan pencarian baru, reset ke halaman 1
-    fetchKelas(1)
-}
-
-// Fungsi Reset Form
+const handleSearch = () => fetchKelas(1)
 const resetSearch = () => {
     searchForm.value = {}
     fetchKelas(1)
 }
 
+// --- Fungsi Manajemen Modal (Tambah Data) ---
+const openModal = () => {
+    editingId.value = null // Pastikan editingId kosong
+    formErrors.value = {}
+    formModel.value = {}
+
+    if (koleksi.value?.template?.data) {
+        koleksi.value.template.data.forEach(field => {
+            formModel.value[field.name] = field.value || ''
+        })
+    }
+    isModalOpen.value = true
+}
+
+// --- Fungsi Manajemen Modal (Edit Data) ---
+const openEditModal = (kelas) => {
+    editingId.value = kelas.id // Set editingId dengan ID kelas yang diklik
+    formErrors.value = {}
+    formModel.value = {}
+
+    // Mengisi formModel dengan data kelas yang dipilih
+    if (koleksi.value?.template?.data) {
+        koleksi.value.template.data.forEach(field => {
+            // Kita ambil value dari objek 'kelas', bukan dari HATEOAS default
+            formModel.value[field.name] = kelas[field.name] || ''
+        })
+    }
+    isModalOpen.value = true
+}
+
+const closeModal = () => {
+    isModalOpen.value = false
+    editingId.value = null // Bersihkan state saat modal ditutup
+}
+
+const submitForm = async () => {
+    isSubmitting.value = true
+    formErrors.value = {}
+
+    try {
+        if (editingId.value) {
+            // Jika mode EDIT, tembak endpoint PUT /api/kelas/{id}
+            await api.put(`/kelas/${editingId.value}`, formModel.value)
+        } else {
+            // Jika mode TAMBAH, tembak endpoint POST /api/kelas
+            await api.post('/kelas', formModel.value)
+        }
+
+        closeModal()
+        // Refresh tabel (tetap di halaman saat ini)
+        fetchKelas(koleksi.value.meta?.current_page || 1)
+
+    } catch (error) {
+        if (error.response && error.response.status === 422) {
+            formErrors.value = error.response.data.errors
+        } else {
+            formErrors.value = { message: 'Terjadi kesalahan sistem saat menyimpan data.' }
+        }
+    } finally {
+        isSubmitting.value = false
+    }
+}
+
+// --- Fungsi Hapus Data ---
+// 1. Fungsi untuk MEMBUKA modal konfirmasi
+const confirmDelete = (id) => {
+    deleteTargetId.value = id
+    isDeleteModalOpen.value = true
+}
+
+// 2. Fungsi EKSEKUSI hapus (Dipanggil saat user klik "Hapus" di dalam modal)
+const executeDelete = async () => {
+    if (!deleteTargetId.value) return
+    
+    isDeleting.value = true // <-- 2. Nyalakan loading sebelum nembak API
+    
+    try {
+        await api.delete(`/kelas/${deleteTargetId.value}`)
+        fetchKelas(koleksi.value.meta?.current_page || 1)
+    } catch (error) {
+        console.error('Error saat menghapus data:', error)
+        alert('Gagal menghapus data kelas.')
+    } finally {
+        isDeleting.value = false // <-- 3. Matikan loading
+        isDeleteModalOpen.value = false
+        deleteTargetId.value = null
+    }
+}
+
+// --- Init ---
 onMounted(() => {
     fetchKelas(1)
 })
