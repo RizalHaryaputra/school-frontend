@@ -73,7 +73,7 @@
                             <td class="px-6 py-5 text-right space-x-2">
                                 <button @click="openEditModal(kelas)"
                                     class="text-sm font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition">Edit</button>
-                                <button
+                                <button @click="confirmDelete(kelas.id)"
                                     class="text-sm font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Hapus</button>
                             </td>
                         </tr>
@@ -90,7 +90,7 @@
                 class="bg-gray-50 px-4 sm:px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
                 <div class="text-center sm:text-left w-full sm:w-auto">
                     Menampilkan halaman <span class="font-semibold text-gray-900">{{ koleksi.meta?.current_page || 1
-                    }}</span> dari <span class="font-semibold text-gray-900">{{ koleksi.meta?.last_page || 1
+                        }}</span> dari <span class="font-semibold text-gray-900">{{ koleksi.meta?.last_page || 1
                         }}</span>
                     <span class="block sm:inline mt-1 sm:mt-0 text-xs sm:text-sm">(Total: <span
                             class="font-semibold text-blue-600">{{ koleksi.meta?.total || 0 }}</span> data)</span>
@@ -120,7 +120,7 @@
                     <div
                         class="relative bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
                         <div class="px-6 py-5 border-b border-gray-100">
-                            <h3 class="text-xl font-bold text-gray-900">{{ editingId ? 'Edit Data Kelas' : 'Tambah Data Kelas' }}</h3>
+                            <h3 class="text-xl font-bold text-gray-900">{{ editingId ? 'Edit Data Kelas' : 'Tambah Kelas' }}</h3>
                             <p class="text-sm text-gray-500 mt-1">Silakan lengkapi formulir di bawah ini.</p>
                         </div>
 
@@ -167,12 +167,24 @@
             </transition>
         </Teleport>
     </div>
+
+    <ConfirmModal
+        :isOpen="isDeleteModalOpen"
+        :isLoading="isDeleting"  title="Hapus Data Kelas"
+        message="Apakah Anda yakin ingin menghapus kelas ini? Tindakan ini tidak dapat dibatalkan."
+        confirmText="Ya, Hapus"
+        cancelText="Batal"
+        type="danger"
+        @confirm="executeDelete"
+        @cancel="isDeleteModalOpen = false"
+    />
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { PlusIcon, ExclamationTriangleIcon, XMarkIcon, ExclamationCircleIcon } from '@heroicons/vue/24/outline'
 import api from '../utils/api'
+import ConfirmModal from '../components/ConfirmModal.vue'
 
 // --- State List & Search ---
 const koleksi = ref({ items: [], meta: null, template: null, queries: [] })
@@ -180,7 +192,12 @@ const isLoading = ref(true)
 const errorMessage = ref('')
 const searchForm = ref({})
 
-// --- State Modal (Tambah Data) ---
+// --- State Hapus ---
+const isDeleteModalOpen = ref(false)
+const deleteTargetId = ref(null)
+const isDeleting = ref(false)
+
+// --- State Modal (Tambah & Edit Data) ---
 const isModalOpen = ref(false)
 const isSubmitting = ref(false)
 const formModel = ref({}) // Tempat menyimpan inputan user untuk modal
@@ -242,6 +259,7 @@ const openModal = () => {
     isModalOpen.value = true
 }
 
+// --- Fungsi Manajemen Modal (Edit Data) ---
 const openEditModal = (kelas) => {
     editingId.value = kelas.id // Set editingId dengan ID kelas yang diklik
     formErrors.value = {}
@@ -287,6 +305,32 @@ const submitForm = async () => {
         }
     } finally {
         isSubmitting.value = false
+    }
+}
+
+// --- Fungsi Hapus Data ---
+// 1. Fungsi untuk MEMBUKA modal konfirmasi
+const confirmDelete = (id) => {
+    deleteTargetId.value = id
+    isDeleteModalOpen.value = true
+}
+
+// 2. Fungsi EKSEKUSI hapus (Dipanggil saat user klik "Hapus" di dalam modal)
+const executeDelete = async () => {
+    if (!deleteTargetId.value) return
+    
+    isDeleting.value = true // <-- 2. Nyalakan loading sebelum nembak API
+    
+    try {
+        await api.delete(`/kelas/${deleteTargetId.value}`)
+        fetchKelas(koleksi.value.meta?.current_page || 1)
+    } catch (error) {
+        console.error('Error saat menghapus data:', error)
+        alert('Gagal menghapus data kelas.')
+    } finally {
+        isDeleting.value = false // <-- 3. Matikan loading
+        isDeleteModalOpen.value = false
+        deleteTargetId.value = null
     }
 }
 
