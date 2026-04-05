@@ -12,6 +12,7 @@ import JadwalFormView from '../views/JadwalFormView.vue'
 import SiswaIndexView from '../views/SiswaIndexView.vue'
 import SiswaFormView from '../views/SiswaFormView.vue'
 import SiswaDetailView from '../views/SiswaDetailView.vue'
+import UserView from '../views/UserView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -87,7 +88,8 @@ const router = createRouter({
         { path: 'siswa', name: 'siswa-index', component: SiswaIndexView },
         { path: 'siswa/tambah', name: 'siswa-create', component: SiswaFormView },
         { path: 'siswa/:id/edit', name: 'siswa-edit', component: SiswaFormView },
-        { path: 'siswa/:id/detail', name: 'siswa-detail', component: SiswaDetailView }
+        { path: 'siswa/:id/detail', name: 'siswa-detail', component: SiswaDetailView },
+        { path: 'users', name: 'users-index', component: UserView }
       ]
     },
 
