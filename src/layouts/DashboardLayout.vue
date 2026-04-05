@@ -44,7 +44,7 @@
                     class="flex items-center space-x-3.5 px-4 py-3 rounded-xl transition font-medium group" :class="$route.path.startsWith('/mapel')
                         ? 'bg-blue-600 text-white shadow-lg shadow-blue-100'
                         : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'">
-                    <UsersIcon class="w-6 h-6"
+                    <AcademicCapIcon class="w-6 h-6"
                         :class="$route.path.startsWith('/mapel') ? 'text-blue-100' : 'text-gray-400 group-hover:text-blue-600'" />
                     <span>Data Mapel</span>
                 </RouterLink>
@@ -52,7 +52,7 @@
                     class="flex items-center space-x-3.5 px-4 py-3 rounded-xl transition font-medium group" :class="$route.path.startsWith('/guru')
                         ? 'bg-blue-600 text-white shadow-lg shadow-blue-100'
                         : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'">
-                    <BriefcaseIcon class="w-6 h-6"
+                    <UsersIcon class="w-6 h-6"
                         :class="$route.path.startsWith('/guru') ? 'text-blue-100' : 'text-gray-400 group-hover:text-blue-600'" />
                     <span>Data Guru</span>
                 </RouterLink>
@@ -104,16 +104,10 @@
         </div>
     </div>
 
-    <ConfirmModal
-        :isOpen="isLogoutModalOpen"
-        :isLoading="isLoggingOut" title="Konfirmasi Logout"
+    <ConfirmModal :isOpen="isLogoutModalOpen" :isLoading="isLoggingOut" title="Konfirmasi Logout"
         message="Apakah Anda yakin ingin keluar dari sesi saat ini? Anda harus login kembali untuk mengakses sistem."
-        confirmText="Ya, Logout"
-        cancelText="Batal"
-        type="danger"
-        @confirm="executeLogout"
-        @cancel="isLogoutModalOpen = false"
-    />
+        confirmText="Ya, Logout" cancelText="Batal" type="danger" @confirm="executeLogout"
+        @cancel="isLogoutModalOpen = false" />
 </template>
 
 <script setup>
