@@ -64,6 +64,14 @@
                         :class="$route.path.startsWith('/jadwal') ? 'text-blue-100' : 'text-gray-400 group-hover:text-blue-600'" />
                     <span>Jadwal Pelajaran</span>
                 </RouterLink>
+                <RouterLink to="/siswa"
+                    class="flex items-center space-x-3.5 px-4 py-3 rounded-xl transition font-medium group" :class="$route.path.startsWith('/siswa')
+                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-100'
+                        : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'">
+                    <UserGroupIcon class="w-6 h-6"
+                        :class="$route.path.startsWith('/siswa') ? 'text-blue-100' : 'text-gray-400 group-hover:text-blue-600'" />
+                    <span>Data Siswa</span>
+                </RouterLink>
             </nav>
 
             <div class="p-6 border-t border-gray-100 bg-gray-50/50 rounded-b-xl">
@@ -123,7 +131,7 @@ import { ref, computed } from 'vue'
 import { RouterLink, RouterView, useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import api from '../utils/api'
-import { AcademicCapIcon, HomeIcon, RectangleGroupIcon, UsersIcon, BriefcaseIcon, Bars3Icon, BellIcon, ArrowRightOnRectangleIcon, XMarkIcon, CalendarDaysIcon } from '@heroicons/vue/24/outline'
+import { AcademicCapIcon, HomeIcon, RectangleGroupIcon, UsersIcon, UserGroupIcon, Bars3Icon, BellIcon, ArrowRightOnRectangleIcon, XMarkIcon, CalendarDaysIcon } from '@heroicons/vue/24/outline'
 import ConfirmModal from '../components/ConfirmModal.vue'
 
 const router = useRouter()
