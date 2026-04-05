@@ -7,6 +7,8 @@ import MapelView from '../views/MapelView.vue'
 import GuruIndexView from '../views/GuruIndexView.vue'
 import GuruFormView from '../views/GuruFormView.vue'
 import GuruDetailView from '../views/GuruDetailView.vue'
+import JadwalIndexView from '../views/JadwalIndexView.vue'
+import JadwalFormView from '../views/JadwalFormView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,7 +32,7 @@ const router = createRouter({
       component: DashboardLayout,
       children: [
         {
-          path: '', 
+          path: '',
           name: 'home',
           component: () => import('../views/HomeView.vue')
         },
@@ -63,6 +65,21 @@ const router = createRouter({
           path: 'guru/:id/detail',
           name: 'guru-detail',
           component: GuruDetailView
+        },
+        {
+          path: 'jadwal',
+          name: 'jadwal-index',
+          component: JadwalIndexView
+        },
+        {
+          path: 'jadwal/tambah',
+          name: 'jadwal-create',
+          component: JadwalFormView
+        },
+        {
+          path: 'jadwal/:id/edit',
+          name: 'jadwal-edit',
+          component: JadwalFormView
         }
       ]
     },
