@@ -40,13 +40,13 @@
                         :class="$route.path.startsWith('/kelas') ? 'text-blue-100' : 'text-gray-400 group-hover:text-blue-600'" />
                     <span>Data Kelas</span>
                 </RouterLink>
-                <RouterLink to="/siswa"
-                    class="flex items-center space-x-3.5 px-4 py-3 rounded-xl transition font-medium group" :class="$route.path.startsWith('/siswa')
+                <RouterLink to="/mapel"
+                    class="flex items-center space-x-3.5 px-4 py-3 rounded-xl transition font-medium group" :class="$route.path.startsWith('/mapel')
                         ? 'bg-blue-600 text-white shadow-lg shadow-blue-100'
                         : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'">
                     <UsersIcon class="w-6 h-6"
-                        :class="$route.path.startsWith('/siswa') ? 'text-blue-100' : 'text-gray-400 group-hover:text-blue-600'" />
-                    <span>Data Siswa</span>
+                        :class="$route.path.startsWith('/mapel') ? 'text-blue-100' : 'text-gray-400 group-hover:text-blue-600'" />
+                    <span>Data Mapel</span>
                 </RouterLink>
                 <RouterLink to="/guru"
                     class="flex items-center space-x-3.5 px-4 py-3 rounded-xl transition font-medium group" :class="$route.path.startsWith('/guru')

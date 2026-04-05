@@ -3,6 +3,7 @@ import { useAuthStore } from '../stores/auth'
 import LoginView from '../views/LoginView.vue'
 import DashboardLayout from '../layouts/DashboardLayout.vue' // Import Layout baru kita
 import KelasView from '../views/KelasView.vue'
+import MapelView from '../views/MapelView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,9 +32,14 @@ const router = createRouter({
           component: () => import('../views/HomeView.vue')
         },
         {
-          path: 'kelas', // <-- Tambahkan block ini
+          path: 'kelas',
           name: 'kelas',
           component: KelasView
+        },
+        {
+          path: 'mapel',
+          name: 'mapel',
+          component: MapelView
         }
       ]
     },
