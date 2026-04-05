@@ -65,7 +65,8 @@
                             class="hover:bg-gray-50/50 transition">
                             <td class="px-6 py-5">
                                 <div class="font-bold text-gray-900 capitalize">{{ jadwal.hari }}</div>
-                                <div class="text-xs font-mono text-gray-500 mt-1">{{ jadwal.jam_pelajaran?.slice(0, 5) }}
+                                <div class="text-xs font-mono text-gray-500 mt-1">
+                                    {{ jadwal.jam_mulai?.slice(0, 5) }} - {{ jadwal.jam_selesai?.slice(0, 5) }}
                                 </div>
                             </td>
                             <td class="px-6 py-5 font-semibold text-gray-800">
@@ -94,7 +95,7 @@
                 class="bg-gray-50 px-4 sm:px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
                 <div class="text-center sm:text-left w-full sm:w-auto">
                     Menampilkan halaman <span class="font-semibold text-gray-900">{{ koleksi.meta?.current_page || 1
-                    }}</span> dari <span class="font-semibold text-gray-900">{{ koleksi.meta?.last_page || 1
+                        }}</span> dari <span class="font-semibold text-gray-900">{{ koleksi.meta?.last_page || 1
                         }}</span>
                     <span class="block sm:inline mt-1 sm:mt-0 text-xs sm:text-sm">(Total: <span
                             class="font-semibold text-blue-600">{{ koleksi.meta?.total || 0 }}</span> jadwal)</span>
