@@ -1,7 +1,6 @@
 import axios from 'axios'
 import { useAuthStore } from '../stores/auth'
 
-// Sesuaikan baseURL dengan port backend Laravel kamu (biasanya 8000)
 const api = axios.create({
     baseURL: 'http://127.0.0.1:8000/api',
     headers: {
@@ -28,7 +27,6 @@ api.interceptors.response.use((response) => {
     if (error.response && error.response.status === 401) {
         const authStore = useAuthStore()
         authStore.logout()
-        // Nanti kita bisa tambahkan logika redirect ke halaman login di sini
     }
     return Promise.reject(error)
 })

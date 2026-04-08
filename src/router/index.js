@@ -35,56 +35,16 @@ const router = createRouter({
       path: '/',
       component: DashboardLayout,
       children: [
-        {
-          path: '',
-          name: 'home',
-          component: () => import('../views/HomeView.vue')
-        },
-        {
-          path: 'kelas',
-          name: 'kelas',
-          component: KelasView
-        },
-        {
-          path: 'mapel',
-          name: 'mapel',
-          component: MapelView
-        },
-        {
-          path: 'guru',
-          name: 'guru-index',
-          component: GuruIndexView
-        },
-        {
-          path: 'guru/tambah',
-          name: 'guru-create',
-          component: GuruFormView
-        },
-        {
-          path: 'guru/:id/edit',
-          name: 'guru-edit',
-          component: GuruFormView
-        },
-        {
-          path: 'guru/:id/detail',
-          name: 'guru-detail',
-          component: GuruDetailView
-        },
-        {
-          path: 'jadwal',
-          name: 'jadwal-index',
-          component: JadwalIndexView
-        },
-        {
-          path: 'jadwal/tambah',
-          name: 'jadwal-create',
-          component: JadwalFormView
-        },
-        {
-          path: 'jadwal/:id/edit',
-          name: 'jadwal-edit',
-          component: JadwalFormView
-        },
+        { path: '', name: 'home', component: () => import('../views/HomeView.vue') },
+        { path: 'kelas', name: 'kelas', component: KelasView },
+        { path: 'mapel', name: 'mapel', component: MapelView },
+        { path: 'guru', name: 'guru-index', component: GuruIndexView },
+        { path: 'guru/tambah', name: 'guru-create', component: GuruFormView },
+        { path: 'guru/:id/edit', name: 'guru-edit', component: GuruFormView },
+        { path: 'guru/:id/detail', name: 'guru-detail', component: GuruDetailView },
+        { path: 'jadwal', name: 'jadwal-index', component: JadwalIndexView },
+        { path: 'jadwal/tambah', name: 'jadwal-create', component: JadwalFormView },
+        { path: 'jadwal/:id/edit', name: 'jadwal-edit', component: JadwalFormView },
         { path: 'siswa', name: 'siswa-index', component: SiswaIndexView },
         { path: 'siswa/tambah', name: 'siswa-create', component: SiswaFormView },
         { path: 'siswa/:id/edit', name: 'siswa-edit', component: SiswaFormView },
