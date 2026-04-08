@@ -7,7 +7,7 @@
             <div class="text-center mb-10">
                 <div
                     class="mx-auto h-16 w-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200 mb-6">
-                    <AcademicCapIcon class="h-10 w-10 text-white" />
+                    <img src="/images/logo-school.png" alt="Logo" class="w-12 h-12" />
                 </div>
                 <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">
                     Selamat Datang

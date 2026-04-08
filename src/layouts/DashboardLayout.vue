@@ -12,7 +12,7 @@
             <div class="h-20 flex items-center justify-between px-6 border-b border-gray-100">
                 <RouterLink :to="{ name: 'home' }" class="flex items-center space-x-3 group">
                     <div class="p-1 rounded-xl bg-blue-600 text-white shadow-blue-300 shadow-md">
-                        <img src="/images/logo-school-edu.png" alt="Logo" class="w-12 h-12" />
+                        <img src="/images/logo-school.png" alt="Logo" class="w-12 h-12" />
                     </div>
                     <span
                         class="font-bold text-2xl text-gray-950 tracking-tight group-hover:text-blue-600 transition">SCHOOL<span
