@@ -52,21 +52,6 @@
                     </div>
                 </div>
 
-                <!-- <div class="flex items-center justify-between pt-2">
-                    <div class="flex items-center">
-                        <input id="remember-me" name="remember-me" type="checkbox"
-                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded text-blue-600">
-                        <label for="remember-me" class="ml-2 block text-sm text-gray-600">
-                            Ingat saya
-                        </label>
-                    </div>
-                    <div class="text-sm">
-                        <a href="#" class="font-medium text-blue-600 hover:text-blue-500 transition">
-                            Lupa password?
-                        </a>
-                    </div>
-                </div> -->
-
                 <div class="pt-4">
                     <button type="submit" :disabled="isLoading"
                         class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all shadow-lg shadow-blue-200 disabled:opacity-70 disabled:cursor-not-allowed">
